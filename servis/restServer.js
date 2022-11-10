@@ -42,18 +42,47 @@ function pokreniServer() {
 function pripremiPutanjeKorisnik(){
     server.get("/api/korisnici",restKorisnici.getKorisnici);
     server.post("/api/korisnici",restKorisnici.postKorisnici);
-    server.put("/api/korisnici",restKorisnici.putKorisnici);
-    server.delete("/api/korisnici",restKorisnici.deleteKorisnici);
+    server.put("/api/korisnici",restKorisnici.nijeImplementirano);
+    server.delete("/api/korisnici",restKorisnici.nijeImplementirano);
 
     server.get("/api/korisnici/:korime",restKorisnici.getKorisnik);
-    server.post("/api/korisnici/:korime",restKorisnici.postKorisnik);
+    server.post("/api/korisnici/:korime",restKorisnici.nijeDopusteno);
     server.put("/api/korisnici/:korime",restKorisnici.putKorisnik);
-    server.delete("/api/korisnici/:korime",restKorisnici.deleteKorisnik);
+    server.delete("/api/korisnici/:korime",restKorisnici.nijeImplementirano);
+
+    server.get("/api/korisnici/:korime/aktivacija",restKorisnici.nijeImplementirano);
     server.post("/api/korisnici/:korime/prijava",restKorisnici.getKorisnikPrijava);
+    server.put("/api/korisnici/:korime/aktivacija",restKorisnici.putAktivacijaKorisnika);
+    server.delete("/api/korisnici/:korime/aktivacija",restKorisnici.nijeImplementirano);
+
+    server.post("/api/korisnici/:korime/prijava",restKorisnici.getKorisnikPrijava);
+    server.get("/api/korisnici/:korime/prijava",restKorisnici.nijeImplementirano);
+    server.put("/api/korisnici/:korime/prijava",restKorisnici.nijeImplementirano);
+    server.delete("/api/korisnici/:korime/prijava",restKorisnici.nijeImplementirano);
+
+    // server.get("/api/filmovi", restKorisnici.getFilmovi); // TO DO
+    server.put("/api/filmovi", restKorisnici.nijeImplementirano);
+    server.delete("/api/filmovi", restKorisnici.nijeImplementirano);
+
+    server.get("/api/filmovi/:id", restKorisnici.getFilm);
+    server.post("/api/filmovi/:id", restKorisnici.nijeDopusteno);
+    server.put("/api/filmovi/:id", restKorisnici.putFilm);
+    server.delete("/api/filmovi/:id", restKorisnici.deleteFilm);
+
+    server.get("/api/zanr", restKorisnici.getZanrovi);
+    server.put("/api/zanr", restKorisnici.nijeImplementirano);
+    // server.delete("/api/zanr", restKorisnici.deleteZanrovi); // TO DO
+
+    server.get("/api/zanr/:id", restKorisnici.getZanr);
+    server.post("/api/zanr/:id", restKorisnici.nijeDopusteno);
+    server.put("/api/zanr/:id", restKorisnici.putZanr);
+    server.delete("/api/zanr/:id", restKorisnici.deleteZanr);
 }
 
 function pripremiPutanjeTMDB() {
     let restTMDB = new RestTMDB(konf.dajKonf()["tmdb.apikey.v3"]);
+    // server.post("/api/filmovi", restTMDB.postFilm.bind(restTMDB)); // TO DO
+    // server.post("/api/zanrovi", restTMDB.postFilm.bind(restTMDB)); // TO DO
     server.get("/api/tmdb/zanr",restTMDB.getZanr.bind(restTMDB));
     server.get("/api/tmdb/filmovi",restTMDB.getFilmovi.bind(restTMDB));
 }
