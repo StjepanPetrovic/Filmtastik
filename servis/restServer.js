@@ -22,42 +22,7 @@ function pokreniServer() {
     server.use(express.json());
 
     server.all("/*", (zahtjev, odgovor, sljedeca) => {
-        let korime = zahtjev.query.korime;
-        let lozinka = zahtjev.query.lozinka;
-    
-        console.log('Vrijednosti dohvacene iz http zahtjeva: ' + korime + ' : ' + lozinka);
-
-        if (korime == null || lozinka == null)
-        {
-            odgovor.status(400);
-            let poruka = { greska: "Niste unijeli u zahtjev korisnicko ime i/ili lozinku" }
-            odgovor.json(poruka);
-        }
-        else
-        {
-            const regexp_korime = /^(?=.*[A-Za-z].*[A-Za-z])(?=.*\d.*\d)[A-Za-z\d]{15,20}$/;
-            const regexp_lozinka = /^(?=.*[A-Za-z].*[A-Za-z].*[A-Za-z])(?=.*?\d.*?\d.*?\d)(?=.*[!-/:-@[-`{-~].*[!-/:-@[-`{-~].*[!-/:-@[-`{-~])[!-~]{20,100}$/;
-
-            if (!regexp_korime.test(korime) || !regexp_lozinka.test(lozinka))
-            {
-                odgovor.status(400);
-                let poruka = { greska: "Korisničko ime treba imati od 15 do 20 slova ili brojeva od čega je obavezno unijeti 2 slova i 2 broja. Lozinka treba imati od 20 do 100 slova ili brojeva ili specijalnih znakova od čega je obavezno unijeti 3 slova, 2 broja i 3 specijalna znaka." }
-                odgovor.json(poruka);
-            }
-            else
-            {
-                if (konf.dajKonf()['rest.korime'] != korime || konf.dajKonf()['rest.lozinka'] != lozinka)
-                {
-                    odgovor.status(401);
-                    let poruka = { greska: "Niste unijeli u zahtjev ispravno korisnicko ime i/ili lozinku koja je definirana u konfiguracijskoj datoteci." }
-                    odgovor.json(poruka);
-                }
-                else
-                {
-                    sljedeca();
-                }
-            }
-        }
+        autorizacija(zahtjev, odgovor, sljedeca);
     })
 
     pripremiPutanjeKorisnik();
@@ -91,4 +56,42 @@ function pripremiPutanjeTMDB() {
     let restTMDB = new RestTMDB(konf.dajKonf()["tmdb.apikey.v3"]);
     server.get("/api/tmdb/zanr",restTMDB.getZanr.bind(restTMDB));
     server.get("/api/tmdb/filmovi",restTMDB.getFilmovi.bind(restTMDB));
+}
+
+function autorizacija(zahtjev, odgovor, sljedeca)
+{
+    let korime = zahtjev.query.korime;
+    let lozinka = zahtjev.query.lozinka;
+
+    if (korime == null || lozinka == null)
+    {
+        odgovor.status(400);
+        let greska = { greska: "Niste unijeli u zahtjev korisnicko ime i/ili lozinku" }
+        odgovor.json(greska);
+    }
+    else
+    {
+        const regexp_korime = /^(?=.*[A-Za-z].*[A-Za-z])(?=.*\d.*\d)[A-Za-z\d]{15,20}$/;
+        const regexp_lozinka = /^(?=.*[A-Za-z].*[A-Za-z].*[A-Za-z])(?=.*?\d.*?\d.*?\d)(?=.*[!-/:-@[-`{-~].*[!-/:-@[-`{-~].*[!-/:-@[-`{-~])[!-~]{20,100}$/;
+
+        if (!regexp_korime.test(korime) || !regexp_lozinka.test(lozinka))
+        {
+            odgovor.status(400);
+            let greska = { greska: "Korisničko ime treba imati od 15 do 20 slova ili brojeva od čega je obavezno unijeti 2 slova i 2 broja. Lozinka treba imati od 20 do 100 slova ili brojeva ili specijalnih znakova od čega je obavezno unijeti 3 slova, 3 broja i 3 specijalna znaka." }
+            odgovor.json(greska);
+        }
+        else
+        {
+            if (konf.dajKonf()['rest.korime'] != korime || konf.dajKonf()['rest.lozinka'] != lozinka)
+            {
+                odgovor.status(401);
+                let greska = { greska: "Niste unijeli u zahtjev ispravno korisnicko ime i/ili lozinku koja je definirana u konfiguracijskoj datoteci." }
+                odgovor.json(greska);
+            }
+            else
+            {
+                sljedeca();
+            }
+        }
+    }
 }
