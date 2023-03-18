@@ -20,6 +20,24 @@ class RestTMDB {
         });
     }
 
+    postFilm(zahtjev,odgovor) {
+        let id_tmdb = zahtjev.query.id_tmdb;
+
+        console.log("Usao sam u funkciju postFilm i dohvatio id filma iz tmdb baze koji je: " + id_tmdb);
+        
+        odgovor.type("application/json");
+        this.tmdbKlijent.dohvatiFilm(id_tmdb).then((film) => {
+            console.log("Vratio sam se iz funkcije dohvatiFilm i podaci za film koje sam dohvatio su: " + film);
+            
+            console.log("-------------------------      " + film["adult"]);
+            let kDAO = new korisnikDAO();
+            kDAO.dodajFilm(film).then();
+            odgovor.send(JSON.stringify(film));
+        }).catch((greska) => {
+            odgovor.json(greska);
+        });
+    }
+
     getFilmovi(zahtjev, odgovor) {
         console.log(this);
         odgovor.type("application/json")
